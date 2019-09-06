@@ -2,6 +2,8 @@
 const express = require('express')
 const mysql = require('mysql')
 const router = express.Router()
+
+
 router.get('/messages', (req, res) => {
   console.log("11111111")
   res.end()
@@ -24,8 +26,7 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     host: 'localhost',
     user: 'root',
-    password: 'hep@12345',
-    database: 'lbta_mysql_basics'
+    database: 'lbta_mysql'
 })
 
 function getConnection() {
@@ -37,19 +38,18 @@ router.post('/user_create', (req, res) => {
     console.log("How do we get the form data???")
   
     console.log("First name: " + req.body.create_first_name)
-    const serialNo = 21
     const firstName = req.body.create_first_name
     const lastName = req.body.create_last_name
-
-    const queryString = "INSERT INTO users (sno,first_name, last_name) VALUES (?, ?, ?)"
-    getConnection().query(queryString, [serialNo,firstName, lastName], (err, results, fields) => {
+  
+    const queryString = "INSERT INTO users (first_name, last_name) VALUES (?, ?)"
+    getConnection().query(queryString, [firstName, lastName], (err, results, fields) => {
       if (err) {
         console.log("Failed to insert new user: " + err)
         res.sendStatus(500)
         return
       }
   
-      console.log("Inserted a new user with id: ", results.serialNo);
+      console.log("Inserted a new user with id: ", results.insertId);
       res.end()
     })
   })
@@ -60,7 +60,7 @@ router.get('/user/:id', (req, res) => {
     const connection = getConnection()
 
     const userId = req.params.id
-    const queryString = "SELECT * FROM users WHERE sno = ?"
+    const queryString = "SELECT * FROM users WHERE id = ?"
     connection.query(queryString, [userId], (err, rows, fields) => {
         if (err) {
         console.log("Failed to query for users: " + err)
